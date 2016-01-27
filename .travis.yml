@@ -18,6 +18,6 @@ script:
 - touch vendor/laravel/laravel/database/database.sqlite
 - cd vendor/laravel/laravel
 - composer install --dev --prefer-source --no-interaction
-- php artisan migrate
+- yes | php artisan migrate
 - cd -
 - vendor/bin/phpunit tests
