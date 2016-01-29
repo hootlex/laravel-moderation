@@ -1,7 +1,7 @@
 {
   "name": "hootlex/moderation",
   "description": "A simple Content Moderation System for Laravel 5.* that allows you to Approve or Reject resources like posts, comments, users, etc.",
-  "keywords": ["laravel", "moderation", "content", "content-moderation", "resource"],
+  "keywords": ["laravel", "moderation", "moderation-system", "content-moderation"],
   "license": "MIT",
   "authors": [
     {
