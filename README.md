@@ -34,7 +34,7 @@ Then include the service provider inside `config/app.php`.
 Lastly you publish the config file.
 
 ```
-php artisan vendor:publish --provider="Hootlex\Friendships\ModerationServiceProvider" --tag=config
+php artisan vendor:publish --provider="Hootlex\Moderation\ModerationServiceProvider" --tag=config
 ```
 
 
