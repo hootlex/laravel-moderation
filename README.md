@@ -150,4 +150,34 @@ $post->isApproved();
 //check if a model is rejected
 $post->isRejected();
 ```
+
+##Strict Moderation
+Strict Moderation means that only Approved resource will be queried. To query Pending resources along with Approved you have to disable Strict Moderation. See how you can do this in the [configuration](#configuration).
+
 ##Configuration
+
+###Global Configuation
+To configuration Moderation package globally you have to edit `config/moderation.php`.
+Inside `moderation.php` you can configure the following:
+
+1. `status_column` represents the default column 'status' in the database. 
+2. `moderated_at_column` represents the default column 'moderated_at' in the database.
+3. `strict` represents [*Strict Moderation*](#strict-moderation).
+
+###Model Configuration
+Inside your Model you can define some variables to overwrite **Global Settings**.
+
+To overwrite `status` column define:
+```php
+const MODERATION_STATUS = 'moderation_status';
+```
+
+To overwrite `moderated_at` column define:
+```php
+const MODERATED_AT = 'mod_at';
+```
+
+To enable or disable [Strict Moderation](#strict-moderation):
+```php
+public static $strictModeration = true;
+```
