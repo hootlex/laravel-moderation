@@ -27,7 +27,7 @@ Then include the service provider inside `config/app.php`.
 ```php
 'providers' => [
     ...
-    Hootlex\Friendships\ModerationServiceProvider::class,
+    Hootlex\Moderation\ModerationServiceProvider::class,
     ...
 ];
 ```
