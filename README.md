@@ -88,7 +88,7 @@ class AddModeratioColumnsToPostsTable extends Migration
 **You are ready to go!**
 
 ##Usage
-> **Note:** In next examples I will use Post model to demostrate how the query builder works. You can Moderate any Eloquent Model, even User. 
+> **Note:** In next examples I will use Post model to demonstrate how the query builder works. You can Moderate any Eloquent Model, even User. 
 
 ###Moderate Models
 You can moderate a model by referencing it's id.
@@ -107,7 +107,7 @@ Post::where('title', 'Horse')->reject();
 ###Query Models
 By default only Approved models will be returned on queries. To change this behavior check the [configuration](#configuration).
 
-So, to query the Approved ones you run your queries as always.
+#####To query the Approved Posts, run your queries as always.
 ```php
 //it will return all Approved Posts
 Post::all();
@@ -115,7 +115,7 @@ Post::all();
 //it will return Approved Posts where title is Horse
 Post::where('title', 'Horse')->get();
 ```
-Query pending or rejected models.
+#####Query pending or rejected models.
 ```php
 //it will return all Pending Posts
 Post::pending()->get();
@@ -129,7 +129,7 @@ Post::withPending()->get();
 //it will return Approved and Rejected Posts
 Post::withRejected()->get();
 ```
-Query ALL models
+#####Query ALL models
 ```php
 //it will return all Posts
 Post::withAnyStatus()->get();
@@ -156,7 +156,7 @@ Strict Moderation means that only Approved resource will be queried. To query Pe
 
 ##Configuration
 
-###Global Configuation
+###Global Configuration
 To configuration Moderation package globally you have to edit `config/moderation.php`.
 Inside `moderation.php` you can configure the following:
 
