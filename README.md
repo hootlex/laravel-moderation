@@ -138,11 +138,16 @@ Post::withAnyStatus()->get();
 Post::withAnyStatus()->where('title', 'Horse')->get();
 ```
 
-##Model Status
+###Model Status
 To check the status of a model there are 3 helper methods which return a boolean value.
 ```php
+//check if a model is pending
 $post->isPending();
+
+//check if a model is approved
 $post->isApproved();
+
+//check if a model is rejected
 $post->isRejected();
 ```
 ##Configuration
