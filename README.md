@@ -1,7 +1,7 @@
 # Laravel Moderation
 A simple Moderation System for Laravel 5.* that allows you to Approve or Reject resources like posts, comments, users, etc.
 
-Keep your application pure by preventing offensive irrelevant, obscene, or insulting content.
+Keep your application pure by preventing offensive, irrelevant, or insulting content.
 
 ##Possible Use Case
 
@@ -86,3 +86,63 @@ class AddModeratioColumnsToPostsTable extends Migration
 ```
 
 **You are ready to go!**
+
+##Usage
+> **Note:** In next examples I will use Post model to demostrate how the query builder works. You can Moderate any Eloquent Model, even User. 
+
+###Moderate Models
+You can moderate a model by referencing it's id.
+```php
+Post::approve($post->id);
+
+Post::reject($post->id);
+```
+Or by making a query.
+```php
+Post::where('title', 'Horse')->approve();
+
+Post::where('title', 'Horse')->reject();
+```
+
+###Query Models
+By default only Approved models will be returned on queries. To change this behavior check the [configuration](#configuration).
+
+So, to query the Approved ones you run your queries as always.
+```php
+//it will return all Approved Posts
+Post::all();
+
+//it will return Approved Posts where title is Horse
+Post::where('title', 'Horse')->get();
+```
+Query pending or rejected models.
+```php
+//it will return all Pending Posts
+Post::pending()->get();
+
+//it will return all Rejected Posts
+Post::rejected()->get();
+
+//it will return Approved and Pending Posts
+Post::withPending()->get();
+
+//it will return Approved and Rejected Posts
+Post::withRejected()->get();
+```
+Query ALL models
+```php
+//it will return all Posts
+Post::withAnyStatus()->get();
+
+//it will return all Posts where title is Horse
+Post::withAnyStatus()->where('title', 'Horse')->get();
+```
+
+##Model Status
+To check the status of a model there are 3 helper methods which return a boolean value.
+```php
+$post->isPending();
+$post->isApproved();
+$post->isRejected();
+```
+##Configuration
