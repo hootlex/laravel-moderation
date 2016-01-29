@@ -4,7 +4,7 @@ namespace Hootlex\Moderation;
 
 
 
-trait Moderation
+trait Moderatable
 {
     /**
      * Indicates if the model is currently force deleting.
@@ -18,7 +18,7 @@ trait Moderation
      *
      * @return void
      */
-    public static function bootModeration()
+    public static function bootModeratable()
     {
         static::addGlobalScope(new ModerationScope);
     }

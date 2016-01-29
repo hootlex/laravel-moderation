@@ -2,12 +2,12 @@
 
 namespace Hootlex\Moderation\Tests;
 
-use Hootlex\Moderation\Moderation;
+use Hootlex\Moderation\Moderatable;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    use Moderation;
+    use Moderatable;
 
     protected $table = 'posts';
 
