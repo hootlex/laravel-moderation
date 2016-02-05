@@ -121,4 +121,22 @@ class ModerationTraitTest extends BaseTestCase
         $this->assertInstanceOf(\Carbon\Carbon::class, $post->{$this->moderated_at_column});
     }
 
+    /** @test */
+    public function it_deletes_resources_of_any_status(){
+        $posts = $this->createPost([], 3);
+        Post::approve($posts[0]->id);
+        Post::reject($posts[1]->id);
+
+        //delete approved
+        $posts[0]->delete();
+        //delete rejected
+        $posts[1]->delete();
+        //delete pending
+        $posts[2]->delete();
+
+        $this->dontSeeInDatabase('posts',['id' => $posts[0]->id]);
+        $this->dontSeeInDatabase('posts',['id' => $posts[1]->id]);
+        $this->dontSeeInDatabase('posts',['id' => $posts[2]->id]);
+    }
+
 }

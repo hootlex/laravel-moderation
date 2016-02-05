@@ -97,7 +97,7 @@ class ModerationScope implements ScopeInterface
         }
 
         $builder->onDelete(function (Builder $builder) {
-            $column = $this->getApprovedAtColumn($builder);
+            $column = $builder->getModel()->getModeratedAtColumn();
 
             return $builder->update([
                 $column => $builder->getModel()->freshTimestampString(),
