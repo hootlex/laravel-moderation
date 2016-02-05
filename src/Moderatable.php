@@ -178,7 +178,6 @@ trait Moderatable
         return array_merge(parent::getDates(), [$this->getModeratedAtColumn()]);
     }
 
-
     /**
      * Perform the actual delete query on this model instance.
      * Ovveriding the \Illuminate\Database\Eloquent\Model::performDeleteOnModel method in order to
@@ -190,6 +189,4 @@ trait Moderatable
     {
         $this->setKeysForSaveQuery($this->newQueryWithoutScopes())->delete();
     }
-
-
 }
