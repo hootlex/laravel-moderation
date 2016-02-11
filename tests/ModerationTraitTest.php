@@ -13,6 +13,7 @@ class ModerationTraitTest extends BaseTestCase
 
     protected $status_column;
     protected $moderated_at_column;
+    protected $moderated_by_column;
 
     public function setUp()
     {
@@ -20,6 +21,7 @@ class ModerationTraitTest extends BaseTestCase
 
         $this->status_column = 'status';
         $this->moderated_at_column = 'moderated_at';
+        $this->moderated_by_column = 'moderated_by';
 
         Post::$strictModeration = true;
     }
@@ -60,7 +62,7 @@ class ModerationTraitTest extends BaseTestCase
         Post::approve($post->id);
 
         $this->seeInDatabase('posts',
-            ['id' => $post->id, $this->status_column => Status::APPROVED, $this->moderated_at_column => \Carbon\Carbon::now()]);
+            ['id' => $post->id, $this->status_column => Status::APPROVED, $this->moderated_at_column => \Carbon\Carbon::now(), $this->moderated_by_column => \Auth::user()]);
     }
 
     /** @test */
@@ -71,7 +73,7 @@ class ModerationTraitTest extends BaseTestCase
         Post::reject($post->id);
 
         $this->seeInDatabase('posts',
-            ['id' => $post->id, $this->status_column => Status::REJECTED, $this->moderated_at_column => \Carbon\Carbon::now()]);
+            ['id' => $post->id, $this->status_column => Status::REJECTED, $this->moderated_at_column => \Carbon\Carbon::now(), $this->moderated_by_column => \Auth::user()]);
     }
 
     /** @test */
