@@ -17,11 +17,14 @@ class ModerationScope implements ScopeInterface
     protected $extensions = [
         'WithPending',
         'WithRejected',
+        'WithPostponed',
         'WithAnyStatus',
         'Pending',
         'Rejected',
+        'Postponed',
         'Approve',
-        'Reject'
+        'Reject',
+        'Postpone',
     ];
 
     /**
@@ -139,6 +142,23 @@ class ModerationScope implements ScopeInterface
     }
 
     /**
+     * Add the with-postpone extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     *
+     * @return void
+     */
+    protected function addWithPostpone(Builder $builder)
+    {
+        $builder->macro('withRejected', function (Builder $builder) {
+            $this->remove($builder, $builder->getModel());
+
+            return $builder->whereIN($this->getStatusColumn($builder),
+                [Status::APPROVED, Status::POSTPONED]);
+        });
+    }
+
+    /**
      * Add the with-any-status extension to the builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder $builder
@@ -194,6 +214,26 @@ class ModerationScope implements ScopeInterface
     }
 
     /**
+     * Add the Postponed extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     *
+     * @return void
+     */
+    protected function addPostponed(Builder $builder)
+    {
+        $builder->macro('postponed', function (Builder $builder) {
+            $model = $builder->getModel();
+
+            $this->remove($builder, $model);
+
+            $builder->where($model->getQualifiedStatusColumn(), '=', Status::POSTPONED);
+
+            return $builder;
+        });
+    }
+
+    /**
      * Add the Approve extension to the builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder $builder
@@ -209,6 +249,7 @@ class ModerationScope implements ScopeInterface
                 $model = $builder->find($id);
                 $model->{$model->getStatusColumn()} = Status::APPROVED;
                 $model->{$model->getModeratedAtColumn()} = Carbon::now();
+                $model->{$model->getModeratedByColumn()} = \Auth::user();
 
                 return $model->save();
             }
@@ -216,6 +257,7 @@ class ModerationScope implements ScopeInterface
             return $builder->update([
                 $builder->getModel()->getStatusColumn() => Status::APPROVED,
                 $builder->getModel()->getModeratedAtColumn() => Carbon::now(),
+                $builder->getModel()->getModeratedByColumn() => \Auth::user(),
             ]);
         });
     }
@@ -236,12 +278,42 @@ class ModerationScope implements ScopeInterface
                 $model = $builder->find($id);
                 $model->{$model->getStatusColumn()} = Status::REJECTED;
                 $model->{$model->getModeratedAtColumn()} = Carbon::now();
+                $model->{$model->getModeratedByColumn()} = \Auth::user();
 
                 return $model->save();
             }
             return $builder->update([
                 $builder->getModel()->getStatusColumn() => Status::REJECTED,
-                $builder->getModel()->getModeratedAtColumn() => Carbon::now()
+                $builder->getModel()->getModeratedAtColumn() => Carbon::now(),
+                $builder->getModel()->getModeratedByColumn() => \Auth::user(),
+            ]);
+        });
+    }
+
+    /**
+     * Add the Postpone extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     *
+     * @return void
+     */
+    protected function addPostpone(Builder $builder)
+    {
+        $builder->macro('postpone', function (Builder $builder, $id = null) {
+            $builder->withAnyStatus();
+            //If $id parameter is passed then update the specified model
+            if ($id) {
+                $model = $builder->find($id);
+                $model->{$model->getStatusColumn()} = Status::POSTPONED;
+                $model->{$model->getModeratedAtColumn()} = Carbon::now();
+                $model->{$model->getModeratedByColumn()} = \Auth::user();
+
+                return $model->save();
+            }
+            return $builder->update([
+                $builder->getModel()->getStatusColumn() => Status::POSTPONED,
+                $builder->getModel()->getModeratedAtColumn() => Carbon::now(),
+                $builder->getModel()->getModeratedByColumn() => \Auth::user(),
             ]);
         });
     }
