@@ -148,7 +148,7 @@ class ModerationScope implements ScopeInterface
      *
      * @return void
      */
-    protected function addWithPostpone(Builder $builder)
+    protected function addWithPostponed(Builder $builder)
     {
         $builder->macro('withRejected', function (Builder $builder) {
             $this->remove($builder, $builder->getModel());
