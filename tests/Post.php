@@ -13,5 +13,5 @@ class Post extends Model
 
     public static $strictModeration = true;
 
-    protected $fillable = ['moderated_at', 'status', 'moderated_by'];
+    protected $fillable = ['moderated_at', 'status'];
 }

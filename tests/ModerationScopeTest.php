@@ -14,7 +14,6 @@ class ModerationScopeTest extends BaseTestCase
 
     protected $status_column;
     protected $moderated_at_column;
-    protected $moderated_by_column;
 
     public function setUp()
     {
@@ -22,7 +21,6 @@ class ModerationScopeTest extends BaseTestCase
 
         $this->status_column = 'status';
         $this->moderated_at_column = 'moderated_at';
-        $this->moderated_by_column = 'moderated_by';
 
         Post::$strictModeration = true;
     }
@@ -152,8 +150,7 @@ class ModerationScopeTest extends BaseTestCase
             [
                 'id' => $post->id,
                 $this->status_column => Status::APPROVED,
-                $this->moderated_at_column => \Carbon\Carbon::now(),
-                $this->moderated_by_column => \Auth::user()
+                $this->moderated_at_column => \Carbon\Carbon::now()
             ]);
     }
 
@@ -168,8 +165,7 @@ class ModerationScopeTest extends BaseTestCase
             [
                 'id' => $post->id,
                 $this->status_column => Status::REJECTED,
-                $this->moderated_at_column => \Carbon\Carbon::now(),
-                $this->moderated_by_column => \Auth::user()
+                $this->moderated_at_column => \Carbon\Carbon::now()
             ]);
     }
 
