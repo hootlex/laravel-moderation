@@ -38,12 +38,12 @@ class ModerationScope implements ScopeInterface
     public function apply(Builder $builder, Model $model)
     {
         $strict = (isset($model::$strictModeration))
-                    ? $model::$strictModeration
-                    : config('moderation.strict');
+            ? $model::$strictModeration
+            : config('moderation.strict');
 
-        if($strict){
+        if ($strict) {
             $builder->where($model->getQualifiedStatusColumn(), '=', Status::APPROVED);
-        }else{
+        } else {
             $builder->whereIn($model->getStatusColumn(), [Status::APPROVED, Status::PENDING]);
         }
 
@@ -55,8 +55,8 @@ class ModerationScope implements ScopeInterface
      *
      * (This method exists in order to achieve compatibility with laravel 5.1.*)
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     * @param  \Illuminate\Database\Eloquent\Model $model
      * @return void
      */
     public function remove(Builder $builder, Model $model)
@@ -66,10 +66,8 @@ class ModerationScope implements ScopeInterface
 
         $bindingKey = 0;
 
-        foreach ((array) $query->wheres as $key => $where)
-        {
-            if ($this->isModerationConstraint($where, $column))
-            {
+        foreach ((array)$query->wheres as $key => $where) {
+            if ($this->isModerationConstraint($where, $column)) {
                 $this->removeWhere($query, $key);
 
                 // Here SoftDeletingScope simply removes the where
@@ -81,7 +79,7 @@ class ModerationScope implements ScopeInterface
             // Check if where is either NULL or NOT NULL type,
             // if that's the case, don't increment the key
             // since there is no binding for these types
-            if ( ! in_array($where['type'], ['Null', 'NotNull'])) $bindingKey++;
+            if (!in_array($where['type'], ['Null', 'NotNull'])) $bindingKey++;
         }
 
     }
@@ -249,16 +247,19 @@ class ModerationScope implements ScopeInterface
                 $model = $builder->find($id);
                 $model->{$model->getStatusColumn()} = Status::APPROVED;
                 $model->{$model->getModeratedAtColumn()} = Carbon::now();
-                $model->{$model->getModeratedByColumn()} = \Auth::user();
+                if ($moderated_by = $model->getModeratedByColumn())
+                    $model->{$moderated_by} = \Auth::user();
 
                 return $model->save();
             }
 
-            return $builder->update([
+            $update = [
                 $builder->getModel()->getStatusColumn() => Status::APPROVED,
-                $builder->getModel()->getModeratedAtColumn() => Carbon::now(),
-                $builder->getModel()->getModeratedByColumn() => \Auth::user(),
-            ]);
+                $builder->getModel()->getModeratedAtColumn() => Carbon::now()
+            ];
+            if ($moderated_by = $builder->getModel()->getModeratedByColumn())
+                $update[$builder->getModel()->getModeratedByColumn()] = \Auth::user();
+            return $builder->update($update);
         });
     }
 
@@ -278,15 +279,18 @@ class ModerationScope implements ScopeInterface
                 $model = $builder->find($id);
                 $model->{$model->getStatusColumn()} = Status::REJECTED;
                 $model->{$model->getModeratedAtColumn()} = Carbon::now();
-                $model->{$model->getModeratedByColumn()} = \Auth::user();
+                if ($moderated_by = $model->getModeratedByColumn())
+                    $model->{$moderated_by} = \Auth::user();
 
                 return $model->save();
             }
-            return $builder->update([
+            $update = [
                 $builder->getModel()->getStatusColumn() => Status::REJECTED,
-                $builder->getModel()->getModeratedAtColumn() => Carbon::now(),
-                $builder->getModel()->getModeratedByColumn() => \Auth::user(),
-            ]);
+                $builder->getModel()->getModeratedAtColumn() => Carbon::now()
+            ];
+            if ($moderated_by = $builder->getModel()->getModeratedByColumn())
+                $update[$builder->getModel()->getModeratedByColumn()] = \Auth::user();
+            return $builder->update($update);
         });
     }
 
@@ -306,15 +310,18 @@ class ModerationScope implements ScopeInterface
                 $model = $builder->find($id);
                 $model->{$model->getStatusColumn()} = Status::POSTPONED;
                 $model->{$model->getModeratedAtColumn()} = Carbon::now();
-                $model->{$model->getModeratedByColumn()} = \Auth::user();
+                if ($moderated_by = $model->getModeratedByColumn())
+                    $model->{$moderated_by} = \Auth::user();
 
                 return $model->save();
             }
-            return $builder->update([
+            $update = [
                 $builder->getModel()->getStatusColumn() => Status::POSTPONED,
-                $builder->getModel()->getModeratedAtColumn() => Carbon::now(),
-                $builder->getModel()->getModeratedByColumn() => \Auth::user(),
-            ]);
+                $builder->getModel()->getModeratedAtColumn() => Carbon::now()
+            ];
+            if ($moderated_by = $builder->getModel()->getModeratedByColumn())
+                $update[$builder->getModel()->getModeratedByColumn()] = \Auth::user();
+            return $builder->update($update);
         });
     }
 
@@ -369,8 +376,8 @@ class ModerationScope implements ScopeInterface
     /**
      * Determine if the given where clause is a moderation constraint.
      *
-     * @param  array   $where
-     * @param  string  $column
+     * @param  array $where
+     * @param  string $column
      * @return bool
      */
     protected function isModerationConstraint(array $where, $column)
