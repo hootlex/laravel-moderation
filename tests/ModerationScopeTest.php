@@ -24,6 +24,9 @@ class ModerationScopeTest extends BaseTestCase
         $this->moderated_at_column = 'moderated_at';
         $this->moderated_by_column = 'moderated_by';
 
+        //create a user and login
+        $this->actingAsUser();
+
         Post::$strictModeration = true;
     }
 
@@ -235,9 +238,6 @@ class ModerationScopeTest extends BaseTestCase
     {
         $posts = $this->createPost([$this->status_column => Status::PENDING], 3);
 
-        //create a user and login
-        $this->actingAsUser();
-
         (new Post)->newQueryWithoutScope(new ModerationScope)->postpone($posts[0]->id);
         (new Post)->newQueryWithoutScope(new ModerationScope)->approve($posts[1]->id);
         (new Post)->newQueryWithoutScope(new ModerationScope)->reject($posts[2]->id);
@@ -246,7 +246,7 @@ class ModerationScopeTest extends BaseTestCase
             $this->seeInDatabase('posts',
                 [
                     'id' => $post->id,
-                    $this->moderated_by_column => \Auth::user()
+                    $this->moderated_by_column => \Auth::user()->id
                 ]);
         }
     }
