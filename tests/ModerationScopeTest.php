@@ -171,6 +171,19 @@ class ModerationScopeTest extends BaseTestCase
     }
 
     /** @test */
+    public function it_postpones_stories()
+    {
+        $posts = $this->createPost([$this->status_column => Status::PENDING], 4);
+        $postsIds = $posts->lists('id')->all();
+
+        (new Post)->newQueryWithoutScope(new ModerationScope)->whereIn('id', $postsIds)->postpone();
+
+        foreach ($postsIds as $postId) {
+            $this->seeInDatabase('posts', ['id' => $postId, $this->status_column => Status::POSTPONED]);
+        }
+    }
+
+    /** @test */
     public function it_approves_a_story_by_id()
     {
         $post = $this->createPost([$this->status_column => Status::PENDING]);
@@ -196,6 +209,21 @@ class ModerationScopeTest extends BaseTestCase
             [
                 'id' => $post->id,
                 $this->status_column => Status::REJECTED,
+                $this->moderated_at_column => \Carbon\Carbon::now()
+            ]);
+    }
+
+    /** @test */
+    public function it_postpones_a_story_by_id()
+    {
+        $post = $this->createPost([$this->status_column => Status::PENDING]);
+
+        (new Post)->newQueryWithoutScope(new ModerationScope)->postpone($post->id);
+
+        $this->seeInDatabase('posts',
+            [
+                'id' => $post->id,
+                $this->status_column => Status::POSTPONED,
                 $this->moderated_at_column => \Carbon\Carbon::now()
             ]);
     }
