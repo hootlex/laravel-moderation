@@ -2,7 +2,6 @@
 
 use Hootlex\Moderation\ModerationScope;
 use Hootlex\Moderation\Status;
-
 use Hootlex\Moderation\Tests\Post;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -236,6 +235,30 @@ class ModerationScopeTest extends BaseTestCase
     /** @test */
     public function it_updates_moderated_by_column_on_status_update()
     {
+        //set moderated by column globally
+        \Illuminate\Support\Facades\Config::set('moderation.moderated_by_column', 'moderated_by');
+
+        $posts = $this->createPost([$this->status_column => Status::PENDING], 3);
+
+        (new Post)->newQueryWithoutScope(new ModerationScope)->where('id', '=', $posts[0]->id)->postpone();
+        (new Post)->newQueryWithoutScope(new ModerationScope)->where('id', '=', $posts[1]->id)->approve();
+        (new Post)->newQueryWithoutScope(new ModerationScope)->where('id', '=', $posts[2]->id)->reject();
+
+        foreach ($posts as $post) {
+            $this->seeInDatabase('posts',
+                [
+                    'id' => $post->id,
+                    $this->moderated_by_column => \Auth::user()->id
+                ]);
+        }
+    }
+
+    /** @test */
+    public function it_updates_moderated_by_column_on_status_update_by_id()
+    {
+        //set moderated by column globally
+        \Illuminate\Support\Facades\Config::set('moderation.moderated_by_column', 'moderated_by');
+
         $posts = $this->createPost([$this->status_column => Status::PENDING], 3);
 
         (new Post)->newQueryWithoutScope(new ModerationScope)->postpone($posts[0]->id);
