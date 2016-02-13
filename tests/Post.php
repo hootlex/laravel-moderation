@@ -9,8 +9,6 @@ class Post extends Model
 {
     use Moderatable;
 
-    const MODERATED_BY= 'moderated_by';
-
     protected $table = 'posts';
 
     public static $strictModeration = true;
