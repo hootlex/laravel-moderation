@@ -50,7 +50,7 @@ class Post extends Model
 }
 ```
 
-Create a migration to add the 3 new columns. [(You can use custom names for the moderation columns)](#configuration)
+Create a migration to add the new columns. [(You can use custom names for the moderation columns)](#configuration)
 
 Example Migration:
 ```php
@@ -66,7 +66,8 @@ class AddModeratioColumnsToPostsTable extends Migration
         Schema::table('posts', function (Blueprint $table) {
             $table->smallInteger('status')->default(0);
             $table->dateTime('moderated_at')->nullable();
-            $table->integer('moderated_by')->nullable()->unsigned();
+            //If you want to track who moderated the Model add 'moderated_by' too.
+            //$table->integer('moderated_by')->nullable()->unsigned();
         });
     }
 
@@ -81,7 +82,7 @@ class AddModeratioColumnsToPostsTable extends Migration
         {
             $table->dropColumn('status');
             $table->dropColumn('moderated_at');
-            $table->integer('moderated_by')->nullable()->unsigned();
+            //$table->integer('moderated_by')->nullable()->unsigned();
         });
     }
 }
