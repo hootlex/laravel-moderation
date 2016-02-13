@@ -2,6 +2,7 @@
 
 namespace Hootlex\Moderation;
 
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -17,11 +18,14 @@ class ModerationScope implements ScopeInterface
     protected $extensions = [
         'WithPending',
         'WithRejected',
+        'WithPostponed',
         'WithAnyStatus',
         'Pending',
         'Rejected',
+        'Postponed',
         'Approve',
-        'Reject'
+        'Reject',
+        'Postpone',
     ];
 
     /**
@@ -35,12 +39,12 @@ class ModerationScope implements ScopeInterface
     public function apply(Builder $builder, Model $model)
     {
         $strict = (isset($model::$strictModeration))
-                    ? $model::$strictModeration
-                    : config('moderation.strict');
+            ? $model::$strictModeration
+            : config('moderation.strict');
 
-        if($strict){
+        if ($strict) {
             $builder->where($model->getQualifiedStatusColumn(), '=', Status::APPROVED);
-        }else{
+        } else {
             $builder->whereIn($model->getStatusColumn(), [Status::APPROVED, Status::PENDING]);
         }
 
@@ -52,8 +56,8 @@ class ModerationScope implements ScopeInterface
      *
      * (This method exists in order to achieve compatibility with laravel 5.1.*)
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $builder
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     * @param  \Illuminate\Database\Eloquent\Model $model
      * @return void
      */
     public function remove(Builder $builder, Model $model)
@@ -63,10 +67,8 @@ class ModerationScope implements ScopeInterface
 
         $bindingKey = 0;
 
-        foreach ((array) $query->wheres as $key => $where)
-        {
-            if ($this->isModerationConstraint($where, $column))
-            {
+        foreach ((array)$query->wheres as $key => $where) {
+            if ($this->isModerationConstraint($where, $column)) {
                 $this->removeWhere($query, $key);
 
                 // Here SoftDeletingScope simply removes the where
@@ -78,7 +80,7 @@ class ModerationScope implements ScopeInterface
             // Check if where is either NULL or NOT NULL type,
             // if that's the case, don't increment the key
             // since there is no binding for these types
-            if ( ! in_array($where['type'], ['Null', 'NotNull'])) $bindingKey++;
+            if (!in_array($where['type'], ['Null', 'NotNull'])) $bindingKey++;
         }
 
     }
@@ -139,6 +141,23 @@ class ModerationScope implements ScopeInterface
     }
 
     /**
+     * Add the with-postpone extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     *
+     * @return void
+     */
+    protected function addWithPostponed(Builder $builder)
+    {
+        $builder->macro('withPostponed', function (Builder $builder) {
+            $this->remove($builder, $builder->getModel());
+
+            return $builder->whereIN($this->getStatusColumn($builder),
+                [Status::APPROVED, Status::POSTPONED]);
+        });
+    }
+
+    /**
      * Add the with-any-status extension to the builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder $builder
@@ -194,6 +213,26 @@ class ModerationScope implements ScopeInterface
     }
 
     /**
+     * Add the Postponed extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     *
+     * @return void
+     */
+    protected function addPostponed(Builder $builder)
+    {
+        $builder->macro('postponed', function (Builder $builder) {
+            $model = $builder->getModel();
+
+            $this->remove($builder, $model);
+
+            $builder->where($model->getQualifiedStatusColumn(), '=', Status::POSTPONED);
+
+            return $builder;
+        });
+    }
+
+    /**
      * Add the Approve extension to the builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder $builder
@@ -204,19 +243,7 @@ class ModerationScope implements ScopeInterface
     {
         $builder->macro('approve', function (Builder $builder, $id = null) {
             $builder->withAnyStatus();
-            //If $id parameter is passed then update the specified model
-            if ($id) {
-                $model = $builder->find($id);
-                $model->{$model->getStatusColumn()} = Status::APPROVED;
-                $model->{$model->getModeratedAtColumn()} = Carbon::now();
-
-                return $model->save();
-            }
-
-            return $builder->update([
-                $builder->getModel()->getStatusColumn() => Status::APPROVED,
-                $builder->getModel()->getModeratedAtColumn() => Carbon::now(),
-            ]);
+            return $this->updateModerationStatus($builder, $id, Status::APPROVED);
         });
     }
 
@@ -231,18 +258,23 @@ class ModerationScope implements ScopeInterface
     {
         $builder->macro('reject', function (Builder $builder, $id = null) {
             $builder->withAnyStatus();
-            //If $id parameter is passed then update the specified model
-            if ($id) {
-                $model = $builder->find($id);
-                $model->{$model->getStatusColumn()} = Status::REJECTED;
-                $model->{$model->getModeratedAtColumn()} = Carbon::now();
+            return $this->updateModerationStatus($builder, $id, Status::REJECTED);
 
-                return $model->save();
-            }
-            return $builder->update([
-                $builder->getModel()->getStatusColumn() => Status::REJECTED,
-                $builder->getModel()->getModeratedAtColumn() => Carbon::now()
-            ]);
+        });
+    }
+
+    /**
+     * Add the Postpone extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     *
+     * @return void
+     */
+    protected function addPostpone(Builder $builder)
+    {
+        $builder->macro('postpone', function (Builder $builder, $id = null) {
+            $builder->withAnyStatus();
+            return $this->updateModerationStatus($builder, $id, Status::POSTPONED);
         });
     }
 
@@ -295,10 +327,44 @@ class ModerationScope implements ScopeInterface
     }
 
     /**
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param $id
+     * @param $status
+     *
+     * @return bool|int
+     */
+    private function updateModerationStatus(Builder $builder, $id, $status)
+    {
+
+        //If $id parameter is passed then update the specified model
+        if ($id) {
+            $model = $builder->find($id);
+            $model->{$model->getStatusColumn()} = $status;
+            $model->{$model->getModeratedAtColumn()} = Carbon::now();
+            //if moderated_by in enabled then append it to the update
+            if ($moderated_by = $model->getModeratedByColumn()) {
+                $model->{$moderated_by} = \Auth::user()->getKey();
+            }
+
+            return $model->save();
+        }
+
+        $update = [
+            $builder->getModel()->getStatusColumn() => $status,
+            $builder->getModel()->getModeratedAtColumn() => Carbon::now()
+        ];
+        //if moderated_by in enabled then append it to the update
+        if ($moderated_by = $builder->getModel()->getModeratedByColumn()) {
+            $update[$builder->getModel()->getModeratedByColumn()] = \Auth::user()->getKey();
+        }
+        return $builder->update($update);
+    }
+
+    /**
      * Determine if the given where clause is a moderation constraint.
      *
-     * @param  array   $where
-     * @param  string  $column
+     * @param  array $where
+     * @param  string $column
      * @return bool
      */
     protected function isModerationConstraint(array $where, $column)

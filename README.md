@@ -40,7 +40,7 @@ php artisan vendor:publish --provider="Hootlex\Moderation\ModerationServiceProvi
 
 ## Setup the Model(s)
 
-To enable moderation for a model, use the `Hootlex\Moderation\Moderatable` trait on the model and add the `status` and `moderated_at` columns to your model's table.
+To enable moderation for a model, use the `Hootlex\Moderation\Moderatable` trait on the model and add the `status`, `moderated_by` and `moderated_at` columns to your model's table.
 ```php
 use Hootlex\Moderation\Moderatable;
 class Post extends Model
@@ -50,7 +50,7 @@ class Post extends Model
 }
 ```
 
-Create a migration to add the 2 new columns. [(You can use custom names for the moderation columns)](#configuration)
+Create a migration to add the new columns. [(You can use custom names for the moderation columns)](#configuration)
 
 Example Migration:
 ```php
@@ -66,6 +66,8 @@ class AddModeratioColumnsToPostsTable extends Migration
         Schema::table('posts', function (Blueprint $table) {
             $table->smallInteger('status')->default(0);
             $table->dateTime('moderated_at')->nullable();
+            //If you want to track who moderated the Model add 'moderated_by' too.
+            //$table->integer('moderated_by')->nullable()->unsigned();
         });
     }
 
@@ -80,6 +82,7 @@ class AddModeratioColumnsToPostsTable extends Migration
         {
             $table->dropColumn('status');
             $table->dropColumn('moderated_at');
+            //$table->integer('moderated_by')->nullable()->unsigned();
         });
     }
 }
@@ -162,6 +165,7 @@ Inside `moderation.php` you can configure the following:
 
 1. `status_column` represents the default column 'status' in the database. 
 2. `moderated_at_column` represents the default column 'moderated_at' in the database.
+2. `moderated_by_column` represents the default column 'moderated_by' in the database.
 3. `strict` represents [*Strict Moderation*](#strict-moderation).
 
 ###Model Configuration
@@ -175,6 +179,11 @@ const MODERATION_STATUS = 'moderation_status';
 To overwrite `moderated_at` column define:
 ```php
 const MODERATED_AT = 'mod_at';
+```
+
+To overwrite `moderated_by` column define:
+```php
+const MODERATED_BY = 'mod_by';
 ```
 
 To enable or disable [Strict Moderation](#strict-moderation):

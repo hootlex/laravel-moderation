@@ -40,8 +40,17 @@ trait Moderatable
      */
     public static function rejected()
     {
-
         return (new static)->newQueryWithoutScope(new ModerationScope())->rejected();
+    }
+
+    /**
+     * Get a new query builder that only includes postponed resources.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public static function postponed()
+    {
+        return (new static)->newQueryWithoutScope(new ModerationScope())->postponed();
     }
 
     /**
@@ -62,6 +71,16 @@ trait Moderatable
     public static function withRejected()
     {
         return (new static)->newQueryWithoutScope(new ModerationScope())->withRejected();
+    }
+
+    /**
+     * Get a new query builder that includes postponed resources.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public static function withPostponed()
+    {
+        return (new static)->newQueryWithoutScope(new ModerationScope())->withPostponed();
     }
 
     /**
@@ -99,6 +118,18 @@ trait Moderatable
     }
 
     /**
+     * Change resource status to Postpone
+     *
+     * @param null $id
+     *
+     * @return mixed
+     */
+    public static function postpone($id)
+    {
+        return (new static)->newQueryWithoutScope(new ModerationScope())->postpone($id);
+    }
+
+    /**
      * Determine if the model instance has been approved.
      *
      * @return bool
@@ -116,6 +147,16 @@ trait Moderatable
     public function isRejected()
     {
         return $this->{$this->getStatusColumn()} == Status::REJECTED;
+    }
+
+    /**
+     * Determine if the model instance has been postponed.
+     *
+     * @return bool
+     */
+    public function isPostponed()
+    {
+        return $this->{$this->getStatusColumn()} == Status::POSTPONED;
     }
 
     /**
@@ -159,6 +200,16 @@ trait Moderatable
     }
 
     /**
+     * Get the fully qualified "moderated by" column.
+     *
+     * @return string
+     */
+    public function getQualifiedModeratedByColumn()
+    {
+        return $this->getTable() . '.' . $this->getModeratedByColumn();
+    }
+
+    /**
      * Get the name of the "moderated at" column.
      *
      * @return string
@@ -166,6 +217,16 @@ trait Moderatable
     public function getModeratedAtColumn()
     {
         return defined('static::MODERATED_AT') ? static::MODERATED_AT : config('moderation.moderated_at_column');
+    }
+
+    /**
+     * Get the name of the "moderated by" column.
+     *
+     * @return string
+     */
+    public function getModeratedByColumn()
+    {
+        return defined('static::MODERATED_BY') ? static::MODERATED_BY : config('moderation.moderated_by_column');
     }
 
     /**

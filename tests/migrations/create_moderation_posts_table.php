@@ -17,6 +17,7 @@ class CreateModerationPostsTable extends Migration
             $table->increments('id');
             $table->smallInteger('status')->default(0);
             $table->dateTime('moderated_at');
+            $table->integer('moderated_by')->nullable()->unsigned();
             $table->timestamps();
         });
     }

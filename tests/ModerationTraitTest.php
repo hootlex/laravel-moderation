@@ -53,6 +53,20 @@ class ModerationTraitTest extends BaseTestCase
     }
 
     /** @test */
+    public function it_returns_only_postponed_stories()
+    {
+        $this->createPost([$this->status_column => Status::POSTPONED], 5);
+
+        $posts = Post::postponed()->get();
+
+        $this->assertNotEmpty($posts);
+
+        foreach ($posts as $post) {
+            $this->assertEquals(Status::POSTPONED, $post->status);
+        }
+    }
+
+    /** @test */
     public function it_approves_a_story_by_id()
     {
         $post = $this->createPost([$this->status_column => Status::PENDING]);
@@ -72,6 +86,17 @@ class ModerationTraitTest extends BaseTestCase
 
         $this->seeInDatabase('posts',
             ['id' => $post->id, $this->status_column => Status::REJECTED, $this->moderated_at_column => \Carbon\Carbon::now()]);
+    }
+
+    /** @test */
+    public function it_postpones_a_story_by_id()
+    {
+        $post = $this->createPost([$this->status_column => Status::PENDING]);
+
+        Post::postpone($post->id);
+
+        $this->seeInDatabase('posts',
+            ['id' => $post->id, $this->status_column => Status::POSTPONED, $this->moderated_at_column => \Carbon\Carbon::now()]);
     }
 
     /** @test */
@@ -111,6 +136,20 @@ class ModerationTraitTest extends BaseTestCase
     }
 
     /** @test */
+    public function it_determines_if_story_is_postponed()
+    {
+        $postApproved = $this->createPost([$this->status_column => Status::APPROVED]);
+        $postPending = $this->createPost([$this->status_column => Status::PENDING]);
+        $postRejected = $this->createPost([$this->status_column => Status::REJECTED]);
+        $postPostponed = $this->createPost([$this->status_column => Status::POSTPONED]);
+
+        $this->assertFalse($postApproved->isPostponed());
+        $this->assertFalse($postPending->isPostponed());
+        $this->assertFalse($postRejected->isPostponed());
+        $this->assertTrue($postPostponed->isPostponed());
+    }
+
+    /** @test */
     public function it_casts_moderated_at_attribute_as_a_date(){
         $post = $this->createPost();
         Post::approve($post->id);
@@ -123,16 +162,14 @@ class ModerationTraitTest extends BaseTestCase
 
     /** @test */
     public function it_deletes_resources_of_any_status(){
-        $posts = $this->createPost([], 3);
+        $posts = $this->createPost([], 4);
         Post::approve($posts[0]->id);
         Post::reject($posts[1]->id);
+        Post::postpone($posts[2]->id);
 
-        //delete approved
-        $posts[0]->delete();
-        //delete rejected
-        $posts[1]->delete();
-        //delete pending
-        $posts[2]->delete();
+        foreach ($posts as $post) {
+            $post->delete();
+        }
 
         $this->dontSeeInDatabase('posts',['id' => $posts[0]->id]);
         $this->dontSeeInDatabase('posts',['id' => $posts[1]->id]);

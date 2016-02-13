@@ -16,6 +16,17 @@ return array(
 
     /*
     |--------------------------------------------------------------------------
+    | Moderated By column
+    |--------------------------------------------------------------------------
+    | Moderated by column is disabled by default.
+    | If you want to include the id of the user who moderated a resource set
+    | here the name of the column.
+    | REMEMBER to migrate the database to add this column.
+    */
+    'moderated_by_column' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Strict Moderation
     |--------------------------------------------------------------------------
     | If Strict Moderation is set to true then the default query will return

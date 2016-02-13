@@ -20,4 +20,10 @@ abstract class BaseTestCase extends TestCase
 
         return (count($posts) > 1) ? $posts : $posts[0];
     }
+
+
+    function actingAsUser()
+    {
+        return $this->actingAs(\App\User::create(['name' => 'tester', 'email' => mt_rand(1,9999).'tester@test.com', 'password' => 'password']));
+    }
 }
