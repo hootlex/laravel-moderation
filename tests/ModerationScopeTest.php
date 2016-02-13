@@ -14,6 +14,7 @@ class ModerationScopeTest extends BaseTestCase
 
     protected $status_column;
     protected $moderated_at_column;
+    protected $moderated_by_column;
 
     public function setUp()
     {
@@ -21,6 +22,7 @@ class ModerationScopeTest extends BaseTestCase
 
         $this->status_column = 'status';
         $this->moderated_at_column = 'moderated_at';
+        $this->moderated_by_column = 'moderated_by';
 
         Post::$strictModeration = true;
     }
@@ -226,6 +228,27 @@ class ModerationScopeTest extends BaseTestCase
                 $this->status_column => Status::POSTPONED,
                 $this->moderated_at_column => \Carbon\Carbon::now()
             ]);
+    }
+
+    /** @test */
+    public function it_updates_moderated_by_column_on_status_update()
+    {
+        $posts = $this->createPost([$this->status_column => Status::PENDING], 3);
+
+        //create a user and login
+        $this->actingAsUser();
+
+        (new Post)->newQueryWithoutScope(new ModerationScope)->postpone($posts[0]->id);
+        (new Post)->newQueryWithoutScope(new ModerationScope)->approve($posts[1]->id);
+        (new Post)->newQueryWithoutScope(new ModerationScope)->reject($posts[2]->id);
+
+        foreach ($posts as $post) {
+            $this->seeInDatabase('posts',
+                [
+                    'id' => $post->id,
+                    $this->moderated_by_column => \Auth::user()
+                ]);
+        }
     }
 
     /** @test */
