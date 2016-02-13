@@ -2,6 +2,7 @@
 
 namespace Hootlex\Moderation;
 
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -242,25 +243,7 @@ class ModerationScope implements ScopeInterface
     {
         $builder->macro('approve', function (Builder $builder, $id = null) {
             $builder->withAnyStatus();
-            //If $id parameter is passed then update the specified model
-            if ($id) {
-                $model = $builder->find($id);
-                $model->{$model->getStatusColumn()} = Status::APPROVED;
-                $model->{$model->getModeratedAtColumn()} = Carbon::now();
-                if ($moderated_by = $model->getModeratedByColumn()) {
-                    $model->{$moderated_by} = \Auth::user();
-                }
-
-                return $model->save();
-            }
-
-            $update = [
-                $builder->getModel()->getStatusColumn() => Status::APPROVED,
-                $builder->getModel()->getModeratedAtColumn() => Carbon::now()
-            ];
-            if ($moderated_by = $builder->getModel()->getModeratedByColumn())
-                $update[$builder->getModel()->getModeratedByColumn()] = \Auth::user();
-            return $builder->update($update);
+            return $this->updateModerationStatus($builder, $id, Status::APPROVED);
         });
     }
 
@@ -275,23 +258,8 @@ class ModerationScope implements ScopeInterface
     {
         $builder->macro('reject', function (Builder $builder, $id = null) {
             $builder->withAnyStatus();
-            //If $id parameter is passed then update the specified model
-            if ($id) {
-                $model = $builder->find($id);
-                $model->{$model->getStatusColumn()} = Status::REJECTED;
-                $model->{$model->getModeratedAtColumn()} = Carbon::now();
-                if ($moderated_by = $model->getModeratedByColumn())
-                    $model->{$moderated_by} = \Auth::user();
+            return $this->updateModerationStatus($builder, $id, Status::REJECTED);
 
-                return $model->save();
-            }
-            $update = [
-                $builder->getModel()->getStatusColumn() => Status::REJECTED,
-                $builder->getModel()->getModeratedAtColumn() => Carbon::now()
-            ];
-            if ($moderated_by = $builder->getModel()->getModeratedByColumn())
-                $update[$builder->getModel()->getModeratedByColumn()] = \Auth::user();
-            return $builder->update($update);
         });
     }
 
@@ -306,23 +274,7 @@ class ModerationScope implements ScopeInterface
     {
         $builder->macro('postpone', function (Builder $builder, $id = null) {
             $builder->withAnyStatus();
-            //If $id parameter is passed then update the specified model
-            if ($id) {
-                $model = $builder->find($id);
-                $model->{$model->getStatusColumn()} = Status::POSTPONED;
-                $model->{$model->getModeratedAtColumn()} = Carbon::now();
-                if ($moderated_by = $model->getModeratedByColumn())
-                    $model->{$moderated_by} = \Auth::user();
-
-                return $model->save();
-            }
-            $update = [
-                $builder->getModel()->getStatusColumn() => Status::POSTPONED,
-                $builder->getModel()->getModeratedAtColumn() => Carbon::now()
-            ];
-            if ($moderated_by = $builder->getModel()->getModeratedByColumn())
-                $update[$builder->getModel()->getModeratedByColumn()] = \Auth::user();
-            return $builder->update($update);
+            return $this->updateModerationStatus($builder, $id, Status::POSTPONED);
         });
     }
 
@@ -372,6 +324,40 @@ class ModerationScope implements ScopeInterface
         unset($bindings[$key]);
 
         $query->setBindings($bindings);
+    }
+
+    /**
+     * @param \Illuminate\Database\Eloquent\Builder $builder
+     * @param $id
+     * @param $status
+     *
+     * @return bool|int
+     */
+    private function updateModerationStatus(Builder $builder, $id, $status)
+    {
+
+        //If $id parameter is passed then update the specified model
+        if ($id) {
+            $model = $builder->find($id);
+            $model->{$model->getStatusColumn()} = $status;
+            $model->{$model->getModeratedAtColumn()} = Carbon::now();
+            //if moderated_by in enabled then append it to the update
+            if ($moderated_by = $model->getModeratedByColumn()) {
+                $model->{$moderated_by} = \Auth::user()->getKey();
+            }
+
+            return $model->save();
+        }
+
+        $update = [
+            $builder->getModel()->getStatusColumn() => $status,
+            $builder->getModel()->getModeratedAtColumn() => Carbon::now()
+        ];
+        //if moderated_by in enabled then append it to the update
+        if ($moderated_by = $builder->getModel()->getModeratedByColumn()) {
+            $update[$builder->getModel()->getModeratedByColumn()] = \Auth::user()->getKey();
+        }
+        return $builder->update($update);
     }
 
     /**
