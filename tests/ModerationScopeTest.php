@@ -65,6 +65,20 @@ class ModerationScopeTest extends BaseTestCase
     }
 
     /** @test */
+    public function it_returns_only_postponed_stories()
+    {
+        $this->createPost([$this->status_column => Status::POSTPONED], 5);
+
+        $posts = (new Post)->newQueryWithoutScope(new ModerationScope)->postponed()->get();
+
+        $this->assertNotEmpty($posts);
+
+        foreach ($posts as $post) {
+            $this->assertEquals(Status::POSTPONED, $post->{$this->status_column});
+        }
+    }
+
+    /** @test */
     public function it_returns_stories_including_pending_ones()
     {
         $this->createPost([$this->status_column => Status::PENDING], 5);
@@ -95,6 +109,23 @@ class ModerationScopeTest extends BaseTestCase
 
         foreach ($posts as $post) {
             $this->assertTrue(($post->{$this->status_column} == Status::APPROVED || $post->{$this->status_column} == Status::REJECTED));
+        }
+    }
+
+    /** @test */
+    public function it_returns_stories_including_postponed_ones()
+    {
+        $this->createPost([$this->status_column => Status::POSTPONED], 5);
+
+        $posts = (new Post)->newQueryWithoutScope(new ModerationScope)->withPostponed()->get();
+
+        $this->assertNotEmpty($posts);
+
+        //with rejected will return more stories than only approved
+        $this->assertTrue($posts > Post::all());
+
+        foreach ($posts as $post) {
+            $this->assertTrue(($post->{$this->status_column} == Status::APPROVED || $post->{$this->status_column} == Status::POSTPONED));
         }
     }
 
