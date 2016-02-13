@@ -247,8 +247,9 @@ class ModerationScope implements ScopeInterface
                 $model = $builder->find($id);
                 $model->{$model->getStatusColumn()} = Status::APPROVED;
                 $model->{$model->getModeratedAtColumn()} = Carbon::now();
-                if ($moderated_by = $model->getModeratedByColumn())
+                if ($moderated_by = $model->getModeratedByColumn()) {
                     $model->{$moderated_by} = \Auth::user();
+                }
 
                 return $model->save();
             }
