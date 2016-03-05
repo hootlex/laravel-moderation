@@ -232,16 +232,4 @@ trait Moderatable
     public function getDates(){
         return array_merge(parent::getDates(), [$this->getModeratedAtColumn()]);
     }
-
-    /**
-     * Perform the actual delete query on this model instance.
-     * Ovveriding the \Illuminate\Database\Eloquent\Model::performDeleteOnModel method in order to
-     * allow the deletion of Moderatable objects of any status when using the delete() method on a loaded object
-     *
-     * @return void
-     */
-    protected function performDeleteOnModel()
-    {
-        $this->setKeysForSaveQuery($this->newQueryWithoutScopes())->delete();
-    }
 }
