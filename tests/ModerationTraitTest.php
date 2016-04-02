@@ -161,6 +161,16 @@ class ModerationTraitTest extends BaseTestCase
     }
 
     /** @test */
+    public function it_deletes_rejected_resources(){
+        $post = $this->createPost([$this->status_column => Status::REJECTED]);
+
+        $postDel = Post::withRejected()->where('id', $post->id)->first();
+        $postDel->delete();
+
+        $this->dontSeeInDatabase('posts',['id' => $post->id]);
+    }
+
+    /** @test */
     public function it_deletes_resources_of_any_status(){
         $posts = $this->createPost([], 4);
         Post::approve($posts[0]->id);
