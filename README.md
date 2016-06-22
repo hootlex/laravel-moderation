@@ -7,10 +7,11 @@ Keep your application pure by preventing offensive, irrelevant, or insulting con
 
 1. User creates a resource (a post, a comment or any Eloquent Model).
 2. The resource is pending and invisible in website (ex. `Post::all()` returns only approved posts).
-3. Admin/Moderator/etc decides if the resource will be approved or rejected.
+3. Moderator decides if the resource will be approved, rejected or postponed.
 
   1. **Approved**: Resource is now public and queryable.
   2. **Rejected**: Resource will be excluded from all queries. Rejected resources will be returned only if you scope a query to include them. (scope: `withRejected`)
+  3. **Postponed**: Resource will be excluded from all queries until Moderator decides to approve it.
 
 4. You application is clean.
 
@@ -99,12 +100,16 @@ You can moderate a model by referencing it's id.
 Post::approve($post->id);
 
 Post::reject($post->id);
+
+Post::postpone($post->id);
 ```
 Or by making a query.
 ```php
 Post::where('title', 'Horse')->approve();
 
 Post::where('title', 'Horse')->reject();
+
+Post::where('title', 'Horse')->postpone();
 ```
 
 ###Query Models
@@ -126,10 +131,16 @@ Post::pending()->get();
 //it will return all Rejected Posts
 Post::rejected()->get();
 
+//it will return all Postponed Posts
+Post::postponed()->get();
+
 //it will return Approved and Pending Posts
 Post::withPending()->get();
 
 //it will return Approved and Rejected Posts
+Post::withRejected()->get();
+
+//it will return Approved and Postponed Posts
 Post::withRejected()->get();
 ```
 #####Query ALL models
@@ -152,6 +163,9 @@ $post->isApproved();
 
 //check if a model is rejected
 $post->isRejected();
+
+//check if a model is rejected
+$post->isPostponed();
 ```
 
 ##Strict Moderation
