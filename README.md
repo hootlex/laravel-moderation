@@ -39,7 +39,7 @@ php artisan vendor:publish --provider="Hootlex\Moderation\ModerationServiceProvi
 ```
 
 
-## Setup the Model(s)
+## Prepare Model
 
 To enable moderation for a model, use the `Hootlex\Moderation\Moderatable` trait on the model and add the `status`, `moderated_by` and `moderated_at` columns to your model's table.
 ```php
@@ -95,7 +95,18 @@ class AddModerationColumnsToPostsTable extends Migration
 > **Note:** In next examples I will use Post model to demonstrate how the query builder works. You can Moderate any Eloquent Model, even User. 
 
 ###Moderate Models
-You can moderate a model by referencing it's id.
+You can moderate a model Instance:
+```php
+$post->markApproved();
+
+$post->markRejected();
+
+$post->markPostponed();
+
+$post->markPending();
+```
+
+or by referencing it's id"
 ```php
 Post::approve($post->id);
 
@@ -103,7 +114,8 @@ Post::reject($post->id);
 
 Post::postpone($post->id);
 ```
-Or by making a query.
+
+or by making a query.
 ```php
 Post::where('title', 'Horse')->approve();
 

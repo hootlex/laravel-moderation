@@ -6,6 +6,7 @@ namespace Hootlex\Moderation;
 
 trait Moderatable
 {
+    use ModerationQueryBuilder;
 
     /**
      * Boot the soft deleting trait for a model.
@@ -15,76 +16,6 @@ trait Moderatable
     public static function bootModeratable()
     {
         static::addGlobalScope(new ModerationScope);
-    }
-
-    /**
-     * Get a new query builder that only includes pending resources.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public static function pending()
-    {
-        return (new static)->newQueryWithoutScope(new ModerationScope())->pending();
-    }
-
-    /**
-     * Get a new query builder that only includes rejected resources.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public static function rejected()
-    {
-        return (new static)->newQueryWithoutScope(new ModerationScope())->rejected();
-    }
-
-    /**
-     * Get a new query builder that only includes postponed resources.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public static function postponed()
-    {
-        return (new static)->newQueryWithoutScope(new ModerationScope())->postponed();
-    }
-
-    /**
-     * Get a new query builder that includes pending resources.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public static function withPending()
-    {
-        return (new static)->newQueryWithoutScope(new ModerationScope())->withPending();
-    }
-
-    /**
-     * Get a new query builder that includes rejected resources.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public static function withRejected()
-    {
-        return (new static)->newQueryWithoutScope(new ModerationScope())->withRejected();
-    }
-
-    /**
-     * Get a new query builder that includes postponed resources.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public static function withPostponed()
-    {
-        return (new static)->newQueryWithoutScope(new ModerationScope())->withPostponed();
-    }
-
-    /**
-     * Get a new query builder that includes all resources.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|static
-     */
-    public static function withAnyStatus()
-    {
-        return (new static)->newQueryWithoutScope(new ModerationScope());
     }
 
     /**
@@ -121,6 +52,50 @@ trait Moderatable
     public static function postpone($id)
     {
         return (new static)->newQueryWithoutScope(new ModerationScope())->postpone($id);
+    }
+
+    /**
+     * Change Instance's status to Approved
+     *
+     * @return mixed
+     */
+    public function markApproved()
+    {
+        $new = (new static)->newQueryWithoutScope(new ModerationScope())->approve($this->id);
+        return $this->setRawAttributes($new->attributesToArray());
+    }
+
+    /**
+     * Change Instance's status to Rejected
+     *
+     * @return mixed
+     */
+    public function markRejected()
+    {
+        $new = (new static)->newQueryWithoutScope(new ModerationScope())->reject($this->id);
+        return $this->setRawAttributes($new->attributesToArray());
+    }
+
+    /**
+     * Change Instance's status to Postponed
+     *
+     * @return mixed
+     */
+    public function markPostponed()
+    {
+        $new = (new static)->newQueryWithoutScope(new ModerationScope())->postpone($this->id);
+        return $this->setRawAttributes($new->attributesToArray());
+    }
+
+    /**
+     * Change Instance's status to Pending
+     *
+     * @return mixed
+     */
+    public function markPending()
+    {
+        $new = (new static)->newQueryWithoutScope(new ModerationScope())->pend($this->id);
+        return $this->setRawAttributes($new->attributesToArray());
     }
 
     /**
