@@ -25,7 +25,7 @@ trait Moderatable
      *
      * @return mixed
      */
-    public static function approve($id = null)
+    public static function approve($id)
     {
         return (new static)->newQueryWithoutScope(new ModerationScope())->approve($id);
     }
@@ -52,6 +52,50 @@ trait Moderatable
     public static function postpone($id)
     {
         return (new static)->newQueryWithoutScope(new ModerationScope())->postpone($id);
+    }
+
+    /**
+     * Change Instance's status to Approved
+     *
+     * @return mixed
+     */
+    public function markApproved()
+    {
+        $new = (new static)->newQueryWithoutScope(new ModerationScope())->approve($this->id);
+        return $this->setRawAttributes($new->attributesToArray());
+    }
+
+    /**
+     * Change Instance's status to Rejected
+     *
+     * @return mixed
+     */
+    public function markRejected()
+    {
+        $new = (new static)->newQueryWithoutScope(new ModerationScope())->reject($this->id);
+        return $this->setRawAttributes($new->attributesToArray());
+    }
+
+    /**
+     * Change Instance's status to Postponed
+     *
+     * @return mixed
+     */
+    public function markPostponed()
+    {
+        $new = (new static)->newQueryWithoutScope(new ModerationScope())->postpone($this->id);
+        return $this->setRawAttributes($new->attributesToArray());
+    }
+
+    /**
+     * Change Instance's status to Pending
+     *
+     * @return mixed
+     */
+    public function markPending()
+    {
+        $new = (new static)->newQueryWithoutScope(new ModerationScope())->pend($this->id);
+        return $this->setRawAttributes($new->attributesToArray());
     }
 
     /**
