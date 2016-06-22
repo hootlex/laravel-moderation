@@ -141,7 +141,7 @@ Post::withPending()->get();
 Post::withRejected()->get();
 
 //it will return Approved and Postponed Posts
-Post::withRejected()->get();
+Post::withPostponed()->get();
 ```
 #####Query ALL models
 ```php
