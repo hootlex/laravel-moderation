@@ -186,4 +186,15 @@ class ModerationTraitTest extends BaseTestCase
         $this->dontSeeInDatabase('posts',['id' => $posts[2]->id]);
     }
 
+    /** @test */
+    public function it_approves_a_story_on_instance()
+    {
+        $post = $this->createPost([$this->status_column => Status::PENDING]);
+
+        $post->approve();
+
+        $this->seeInDatabase('posts',
+            ['id' => $post->id, $this->status_column => Status::APPROVED, $this->moderated_at_column => \Carbon\Carbon::now()]);
+    }
+
 }
