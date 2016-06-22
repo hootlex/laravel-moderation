@@ -100,6 +100,17 @@ class ModerationTraitTest extends BaseTestCase
     }
 
     /** @test */
+    public function it_pendings_a_story_by_id()
+    {
+        $post = $this->createPost([$this->status_column => Status::APPROVED]);
+
+        Post::pend($post->id);
+
+        $this->seeInDatabase('posts',
+            ['id' => $post->id, $this->status_column => Status::PENDING, $this->moderated_at_column => \Carbon\Carbon::now()]);
+    }
+
+    /** @test */
     public function it_determines_if_story_is_approved()
     {
         $postApproved = $this->createPost([$this->status_column => Status::APPROVED]);
@@ -187,14 +198,55 @@ class ModerationTraitTest extends BaseTestCase
     }
 
     /** @test */
-    public function it_approves_a_story_on_instance()
+    public function it_marks_as_approved_an_instance()
     {
         $post = $this->createPost([$this->status_column => Status::PENDING]);
 
-        $post->approve();
+        $post->markApproved();
+
+        $this->assertEquals(Status::APPROVED, $post->status);
 
         $this->seeInDatabase('posts',
             ['id' => $post->id, $this->status_column => Status::APPROVED, $this->moderated_at_column => \Carbon\Carbon::now()]);
+    }
+
+    /** @test */
+    public function it_marks_as_rejected_an_instance()
+    {
+        $post = $this->createPost([$this->status_column => Status::PENDING]);
+
+        $post->markRejected();
+
+        $this->assertEquals(Status::REJECTED, $post->status);
+
+        $this->seeInDatabase('posts',
+            ['id' => $post->id, $this->status_column => Status::REJECTED, $this->moderated_at_column => \Carbon\Carbon::now()]);
+    }
+
+    /** @test */
+    public function it_marks_as_postponed_an_instance()
+    {
+        $post = $this->createPost([$this->status_column => Status::PENDING]);
+
+        $post->markPostponed();
+
+        $this->assertEquals(Status::POSTPONED, $post->status);
+
+        $this->seeInDatabase('posts',
+            ['id' => $post->id, $this->status_column => Status::POSTPONED, $this->moderated_at_column => \Carbon\Carbon::now()]);
+    }
+
+    /** @test */
+    public function it_marks_as_pending_an_instance()
+    {
+        $post = $this->createPost([$this->status_column => Status::PENDING]);
+
+        $post->markPending();
+
+        $this->assertEquals(Status::PENDING, $post->status);
+
+        $this->seeInDatabase('posts',
+            ['id' => $post->id, $this->status_column => Status::PENDING, $this->moderated_at_column => \Carbon\Carbon::now()]);
     }
 
 }
