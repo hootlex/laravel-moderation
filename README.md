@@ -82,7 +82,7 @@ class AddModerationColumnsToPostsTable extends Migration
         {
             $table->dropColumn('status');
             $table->dropColumn('moderated_at');
-            //$table->integer('moderated_by')->nullable()->unsigned();
+            //$table->dropColumn('moderated_by');
         });
     }
 }
