@@ -26,6 +26,7 @@ class ModerationScope implements ScopeInterface
         'Approve',
         'Reject',
         'Postpone',
+        'Pend'
     ];
 
     /**
@@ -279,6 +280,21 @@ class ModerationScope implements ScopeInterface
     }
 
     /**
+     * Add the Postpone extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     *
+     * @return void
+     */
+    protected function addPend(Builder $builder)
+    {
+        $builder->macro('pend', function (Builder $builder, $id = null) {
+            $builder->withAnyStatus();
+            return $this->updateModerationStatus($builder, $id, Status::PENDING);
+        });
+    }
+
+    /**
      * Get the "deleted at" column for the builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder $builder
@@ -346,7 +362,8 @@ class ModerationScope implements ScopeInterface
                 $model->{$moderated_by} = \Auth::user()->getKey();
             }
 
-            return $model->save();
+            $model->save();
+            return $model;
         }
 
         $update = [
