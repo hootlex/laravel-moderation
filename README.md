@@ -54,7 +54,7 @@ Create a migration to add the new columns. [(You can use custom names for the mo
 
 Example Migration:
 ```php
-class AddModeratioColumnsToPostsTable extends Migration
+class AddModerationColumnsToPostsTable extends Migration
 {
     /**
      * Run the migrations.
