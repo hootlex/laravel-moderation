@@ -46,7 +46,7 @@ class ModerationScope implements ScopeInterface
         if ($strict) {
             $builder->where($model->getQualifiedStatusColumn(), '=', Status::APPROVED);
         } else {
-            $builder->whereIn($model->getStatusColumn(), [Status::APPROVED, Status::PENDING]);
+            $builder->where($model->getQualifiedStatusColumn(), '!=', Status::REJECTED);
         }
 
         $this->extend($builder);
