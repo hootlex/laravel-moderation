@@ -106,7 +106,7 @@ $post->markPostponed();
 $post->markPending();
 ```
 
-or by referencing it's id"
+or by referencing it's id
 ```php
 Post::approve($post->id);
 
