@@ -23,7 +23,7 @@ before_script:
   - cp src/config/moderation.php vendor/laravel/laravel/config/moderation.php
   - touch vendor/laravel/laravel/database/database.sqlite
   - cd vendor/laravel/laravel
-  - composer install --dev --prefer-source --no-interaction
+  - composer update --dev --prefer-source --no-interaction
   - yes | php artisan migrate
   - cd -
 
