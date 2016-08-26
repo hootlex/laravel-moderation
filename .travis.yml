@@ -2,7 +2,7 @@ language: php
 
 php:
   - 5.6
-  - hhvm
+  - 7.0
 
 sudo: false
 
@@ -13,17 +13,17 @@ cache:
     - $HOME/.composer/cache
 
 before_install:
-  - if [[ $TRAVIS_PHP_VERSION != hhvm ]]; then phpenv config-rm xdebug.ini; fi;
+  - phpenv config-rm xdebug.ini
 
 install:
-  - composer install --dev --prefer-source --no-interaction
+  - COMPOSER_DISCARD_CHANGES=1 composer install --dev --prefer-source --no-interaction
 
 before_script:
   - cp tests/migrations/create_moderation_posts_table.php vendor/laravel/laravel/database/migrations/2015_11_19_053825_create_moderation_posts_table.php
   - cp src/config/moderation.php vendor/laravel/laravel/config/moderation.php
   - touch vendor/laravel/laravel/database/database.sqlite
   - cd vendor/laravel/laravel
-  - composer install --dev --prefer-source --no-interaction
+  - composer update --dev --prefer-source --no-interaction
   - yes | php artisan migrate
   - cd -
 

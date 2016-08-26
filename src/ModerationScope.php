@@ -6,9 +6,9 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\ScopeInterface;
+use Illuminate\Database\Eloquent\Scope;
 
-class ModerationScope implements ScopeInterface
+class ModerationScope implements Scope
 {
     /**
      * All of the extensions to be added to the builder.

@@ -152,7 +152,7 @@ class ModerationScopeTest extends BaseTestCase
     public function it_approves_stories()
     {
         $posts = $this->createPost([$this->status_column => Status::PENDING], 4);
-        $postsIds = $posts->lists('id')->all();
+        $postsIds = $posts->pluck('id')->all();
 
         (new Post)->newQueryWithoutScope(new ModerationScope)->whereIn('id', $postsIds)->approve();
 
@@ -165,7 +165,7 @@ class ModerationScopeTest extends BaseTestCase
     public function it_rejects_stories()
     {
         $posts = $this->createPost([$this->status_column => Status::PENDING], 4);
-        $postsIds = $posts->lists('id')->all();
+        $postsIds = $posts->pluck('id')->all();
 
         (new Post)->newQueryWithoutScope(new ModerationScope)->whereIn('id', $postsIds)->reject();
 
@@ -178,7 +178,7 @@ class ModerationScopeTest extends BaseTestCase
     public function it_postpones_stories()
     {
         $posts = $this->createPost([$this->status_column => Status::PENDING], 4);
-        $postsIds = $posts->lists('id')->all();
+        $postsIds = $posts->pluck('id')->all();
 
         (new Post)->newQueryWithoutScope(new ModerationScope)->whereIn('id', $postsIds)->postpone();
 
@@ -300,7 +300,7 @@ class ModerationScopeTest extends BaseTestCase
         Post::$strictModeration = false;
 
         $posts = $this->createPost([$this->status_column => Status::PENDING], 5);
-        $postsIds = $posts->lists('id')->all();
+        $postsIds = $posts->pluck('id')->all();
 
         $postsReturned = Post::whereIn('id', $postsIds)->get();
 
