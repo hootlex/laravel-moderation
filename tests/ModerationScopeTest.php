@@ -157,7 +157,7 @@ class ModerationScopeTest extends BaseTestCase
         (new Post)->newQueryWithoutScope(new ModerationScope)->whereIn('id', $postsIds)->approve();
 
         foreach ($postsIds as $postId) {
-            $this->seeInDatabase('posts', ['id' => $postId, $this->status_column => Status::APPROVED]);
+            $this->assertDatabaseHas('posts', ['id' => $postId, $this->status_column => Status::APPROVED]);
         }
     }
 
@@ -170,7 +170,7 @@ class ModerationScopeTest extends BaseTestCase
         (new Post)->newQueryWithoutScope(new ModerationScope)->whereIn('id', $postsIds)->reject();
 
         foreach ($postsIds as $postId) {
-            $this->seeInDatabase('posts', ['id' => $postId, $this->status_column => Status::REJECTED]);
+            $this->assertDatabaseHas('posts', ['id' => $postId, $this->status_column => Status::REJECTED]);
         }
     }
 
@@ -183,7 +183,7 @@ class ModerationScopeTest extends BaseTestCase
         (new Post)->newQueryWithoutScope(new ModerationScope)->whereIn('id', $postsIds)->postpone();
 
         foreach ($postsIds as $postId) {
-            $this->seeInDatabase('posts', ['id' => $postId, $this->status_column => Status::POSTPONED]);
+            $this->assertDatabaseHas('posts', ['id' => $postId, $this->status_column => Status::POSTPONED]);
         }
     }
 
@@ -194,7 +194,7 @@ class ModerationScopeTest extends BaseTestCase
 
         (new Post)->newQueryWithoutScope(new ModerationScope)->approve($post->id);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             [
                 'id' => $post->id,
                 $this->status_column => Status::APPROVED,
@@ -209,7 +209,7 @@ class ModerationScopeTest extends BaseTestCase
 
         (new Post)->newQueryWithoutScope(new ModerationScope)->reject($post->id);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             [
                 'id' => $post->id,
                 $this->status_column => Status::REJECTED,
@@ -224,7 +224,7 @@ class ModerationScopeTest extends BaseTestCase
 
         (new Post)->newQueryWithoutScope(new ModerationScope)->postpone($post->id);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             [
                 'id' => $post->id,
                 $this->status_column => Status::POSTPONED,
@@ -245,7 +245,7 @@ class ModerationScopeTest extends BaseTestCase
         (new Post)->newQueryWithoutScope(new ModerationScope)->where('id', '=', $posts[2]->id)->reject();
 
         foreach ($posts as $post) {
-            $this->seeInDatabase('posts',
+            $this->assertDatabaseHas('posts',
                 [
                     'id' => $post->id,
                     $this->moderated_by_column => \Auth::user()->id
@@ -266,7 +266,7 @@ class ModerationScopeTest extends BaseTestCase
         (new Post)->newQueryWithoutScope(new ModerationScope)->reject($posts[2]->id);
 
         foreach ($posts as $post) {
-            $this->seeInDatabase('posts',
+            $this->assertDatabaseHas('posts',
                 [
                     'id' => $post->id,
                     $this->moderated_by_column => \Auth::user()->id

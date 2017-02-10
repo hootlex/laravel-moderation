@@ -98,14 +98,6 @@ class ModerationScope implements Scope
         foreach ($this->extensions as $extension) {
             $this->{"add{$extension}"}($builder);
         }
-
-        $builder->onDelete(function (Builder $builder) {
-            $column = $builder->getModel()->getModeratedAtColumn();
-
-            return $builder->update([
-                $column => $builder->getModel()->freshTimestampString(),
-            ]);
-        });
     }
 
     /**

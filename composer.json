@@ -12,7 +12,7 @@
   "autoload-dev": {
     "classmap": [
       "tests",
-      "vendor/laravel/laravel/tests/TestCase.php"
+      "vendor/laravel/laravel/tests"
     ]
   },
   "require": {

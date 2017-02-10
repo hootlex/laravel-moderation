@@ -73,7 +73,7 @@ class ModerationTraitTest extends BaseTestCase
 
         Post::approve($post->id);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             ['id' => $post->id, $this->status_column => Status::APPROVED, $this->moderated_at_column => \Carbon\Carbon::now()]);
     }
 
@@ -84,7 +84,7 @@ class ModerationTraitTest extends BaseTestCase
 
         Post::reject($post->id);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             ['id' => $post->id, $this->status_column => Status::REJECTED, $this->moderated_at_column => \Carbon\Carbon::now()]);
     }
 
@@ -95,7 +95,7 @@ class ModerationTraitTest extends BaseTestCase
 
         Post::postpone($post->id);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             ['id' => $post->id, $this->status_column => Status::POSTPONED, $this->moderated_at_column => \Carbon\Carbon::now()]);
     }
 
@@ -106,7 +106,7 @@ class ModerationTraitTest extends BaseTestCase
 
         Post::pend($post->id);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             ['id' => $post->id, $this->status_column => Status::PENDING, $this->moderated_at_column => \Carbon\Carbon::now()]);
     }
 
@@ -178,7 +178,7 @@ class ModerationTraitTest extends BaseTestCase
         $postDel = Post::withRejected()->where('id', $post->id)->first();
         $postDel->delete();
 
-        $this->dontSeeInDatabase('posts',['id' => $post->id]);
+        $this->assertDatabaseMissing('posts',['id' => $post->id]);
     }
 
     /** @test */
@@ -192,9 +192,9 @@ class ModerationTraitTest extends BaseTestCase
             $post->delete();
         }
 
-        $this->dontSeeInDatabase('posts',['id' => $posts[0]->id]);
-        $this->dontSeeInDatabase('posts',['id' => $posts[1]->id]);
-        $this->dontSeeInDatabase('posts',['id' => $posts[2]->id]);
+        $this->assertDatabaseMissing('posts',['id' => $posts[0]->id]);
+        $this->assertDatabaseMissing('posts',['id' => $posts[1]->id]);
+        $this->assertDatabaseMissing('posts',['id' => $posts[2]->id]);
     }
 
     /** @test */
@@ -206,7 +206,7 @@ class ModerationTraitTest extends BaseTestCase
 
         $this->assertEquals(Status::APPROVED, $post->status);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             ['id' => $post->id, $this->status_column => Status::APPROVED, $this->moderated_at_column => \Carbon\Carbon::now()]);
     }
 
@@ -219,7 +219,7 @@ class ModerationTraitTest extends BaseTestCase
 
         $this->assertEquals(Status::REJECTED, $post->status);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             ['id' => $post->id, $this->status_column => Status::REJECTED, $this->moderated_at_column => \Carbon\Carbon::now()]);
     }
 
@@ -232,7 +232,7 @@ class ModerationTraitTest extends BaseTestCase
 
         $this->assertEquals(Status::POSTPONED, $post->status);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             ['id' => $post->id, $this->status_column => Status::POSTPONED, $this->moderated_at_column => \Carbon\Carbon::now()]);
     }
 
@@ -245,7 +245,7 @@ class ModerationTraitTest extends BaseTestCase
 
         $this->assertEquals(Status::PENDING, $post->status);
 
-        $this->seeInDatabase('posts',
+        $this->assertDatabaseHas('posts',
             ['id' => $post->id, $this->status_column => Status::PENDING, $this->moderated_at_column => \Carbon\Carbon::now()]);
     }
 

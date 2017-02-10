@@ -1,6 +1,8 @@
 <?php
 
 use Hootlex\Moderation\Tests\Post;
+use Tests\TestCase;
+
 
 abstract class BaseTestCase extends TestCase
 {
@@ -14,7 +16,7 @@ abstract class BaseTestCase extends TestCase
     {
         $posts = new \Illuminate\Database\Eloquent\Collection;
         for ($i = 0; $i < $amount; $i++) {
-            $post = Post::create(array_merge(['moderated_at' => 0], $overrides));
+            $post = Post::create(array_merge(['moderated_at' => \Carbon\Carbon::now()], $overrides));
             $posts->push($post);
         }
 
