@@ -71,15 +71,7 @@ class ModerationScopeTest extends BaseTestCase
     /** @test */
     public function it_returns_only_postponed_stories()
     {
-        $this->createPost([$this->status_column => Status::POSTPONED], 5);
 
-        $posts = (new Post)->newQueryWithoutScope(new ModerationScope)->postponed()->get();
-
-        $this->assertNotEmpty($posts);
-
-        foreach ($posts as $post) {
-            $this->assertEquals(Status::POSTPONED, $post->{$this->status_column});
-        }
     }
 
     /** @test */
@@ -308,6 +300,20 @@ class ModerationScopeTest extends BaseTestCase
 
         foreach ($posts as $post) {
             $this->assertTrue(($post->{$this->status_column} == Status::PENDING));
+        }
+    }
+
+    /** @test */
+    public function it_queries_approved_stories_when_not_in_strict_mode()
+    {
+        $this->createPost([$this->status_column => Status::APPROVED], 5);
+
+        $posts = (new Post)->newQueryWithoutScope(new ModerationScope)->approved()->get();
+
+        $this->assertNotEmpty($posts);
+
+        foreach ($posts as $post) {
+            $this->assertEquals(Status::APPROVED, $post->{$this->status_column});
         }
     }
 }

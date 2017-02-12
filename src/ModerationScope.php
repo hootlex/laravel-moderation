@@ -23,6 +23,7 @@ class ModerationScope implements Scope
         'Pending',
         'Rejected',
         'Postponed',
+        'Approved',
         'Approve',
         'Reject',
         'Postpone',
@@ -161,6 +162,26 @@ class ModerationScope implements Scope
     {
         $builder->macro('withAnyStatus', function (Builder $builder) {
             $this->remove($builder, $builder->getModel());
+            return $builder;
+        });
+    }
+
+    /**
+     * Add the Approved extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder $builder
+     *
+     * @return void
+     */
+    protected function addApproved(Builder $builder)
+    {
+        $builder->macro('approved', function (Builder $builder) {
+            $model = $builder->getModel();
+
+            $this->remove($builder, $model);
+
+            $builder->where($model->getQualifiedStatusColumn(), '=', Status::APPROVED);
+
             return $builder;
         });
     }
