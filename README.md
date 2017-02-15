@@ -129,11 +129,15 @@ By default only Approved models will be returned on queries. To change this beha
 
 #####To query the Approved Posts, run your queries as always.
 ```php
-//it will return all Approved Posts
+//it will return all Approved Posts (strict mode)
 Post::all();
+
+// when not in strict mode
+Post::approved()->get();
 
 //it will return Approved Posts where title is Horse
 Post::where('title', 'Horse')->get();
+
 ```
 #####Query pending or rejected models.
 ```php
