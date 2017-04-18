@@ -3,7 +3,7 @@ A simple Moderation System for Laravel 5.* that allows you to Approve or Reject 
 
 Keep your application pure by preventing offensive, irrelevant, or insulting content.
 
-##Possible Use Case
+## Possible Use Case
 
 1. User creates a resource (a post, a comment or any Eloquent Model).
 2. The resource is pending and invisible in website (ex. `Post::all()` returns only approved posts).
@@ -15,7 +15,7 @@ Keep your application pure by preventing offensive, irrelevant, or insulting con
 
 4. You application is clean.
 
-##Installation
+## Installation
 
 First, install the package through Composer.
 
@@ -91,10 +91,10 @@ class AddModerationColumnsToPostsTable extends Migration
 
 **You are ready to go!**
 
-##Usage
+## Usage
 > **Note:** In next examples I will use Post model to demonstrate how the query builder works. You can Moderate any Eloquent Model, even User. 
 
-###Moderate Models
+### Moderate Models
 You can moderate a model Instance:
 ```php
 $post->markApproved();
@@ -124,10 +124,10 @@ Post::where('title', 'Horse')->reject();
 Post::where('title', 'Horse')->postpone();
 ```
 
-###Query Models
+### Query Models
 By default only Approved models will be returned on queries. To change this behavior check the [configuration](#configuration).
 
-#####To query the Approved Posts, run your queries as always.
+##### To query the Approved Posts, run your queries as always.
 ```php
 //it will return all Approved Posts (strict mode)
 Post::all();
@@ -139,7 +139,7 @@ Post::approved()->get();
 Post::where('title', 'Horse')->get();
 
 ```
-#####Query pending or rejected models.
+##### Query pending or rejected models.
 ```php
 //it will return all Pending Posts
 Post::pending()->get();
@@ -159,7 +159,7 @@ Post::withRejected()->get();
 //it will return Approved and Postponed Posts
 Post::withPostponed()->get();
 ```
-#####Query ALL models
+##### Query ALL models
 ```php
 //it will return all Posts
 Post::withAnyStatus()->get();
@@ -168,7 +168,7 @@ Post::withAnyStatus()->get();
 Post::withAnyStatus()->where('title', 'Horse')->get();
 ```
 
-###Model Status
+### Model Status
 To check the status of a model there are 3 helper methods which return a boolean value.
 ```php
 //check if a model is pending
@@ -184,12 +184,12 @@ $post->isRejected();
 $post->isPostponed();
 ```
 
-##Strict Moderation
+## Strict Moderation
 Strict Moderation means that only Approved resource will be queried. To query Pending resources along with Approved you have to disable Strict Moderation. See how you can do this in the [configuration](#configuration).
 
-##Configuration
+## Configuration
 
-###Global Configuration
+### Global Configuration
 To configuration Moderation package globally you have to edit `config/moderation.php`.
 Inside `moderation.php` you can configure the following:
 
@@ -198,7 +198,7 @@ Inside `moderation.php` you can configure the following:
 2. `moderated_by_column` represents the default column 'moderated_by' in the database.
 3. `strict` represents [*Strict Moderation*](#strict-moderation).
 
-###Model Configuration
+### Model Configuration
 Inside your Model you can define some variables to overwrite **Global Settings**.
 
 To overwrite `status` column define:
