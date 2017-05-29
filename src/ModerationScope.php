@@ -64,6 +64,8 @@ class ModerationScope implements Scope
      */
     public function remove(Builder $builder, Model $model)
     {
+        $builder->withoutGlobalScope($this);
+
         $column = $model->getQualifiedStatusColumn();
         $query = $builder->getQuery();
 
