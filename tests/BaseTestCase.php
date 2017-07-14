@@ -26,6 +26,7 @@ abstract class BaseTestCase extends TestCase
 
     function actingAsUser()
     {
-        return $this->actingAs(\App\User::create(['name' => 'tester', 'email' => mt_rand(1,9999).'tester@test.com', 'password' => 'password']));
+        $userModel = config('auth.providers.users.model', config('auth.model', 'App\User'));
+        return $this->actingAs($userModel::create(['name' => 'tester', 'email' => mt_rand(1,9999).'tester@test.com', 'password' => 'password']));
     }
 }
