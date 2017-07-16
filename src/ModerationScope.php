@@ -2,7 +2,6 @@
 
 namespace Hootlex\Moderation;
 
-use App\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
