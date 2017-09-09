@@ -26,5 +26,12 @@
     "psr-4": {
       "Hootlex\\Moderation\\": "src/"
     }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Hootlex\\Moderation\\ModerationServiceProvider"
+      ]
+    }
   }
 }
