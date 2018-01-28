@@ -67,7 +67,7 @@ class AddModerationColumnsToPostsTable extends Migration
         Schema::table('posts', function (Blueprint $table) {
             $table->smallInteger('status')->default(0);
             $table->dateTime('moderated_at')->nullable();
-            //If you want to track who moderated the Model add 'moderated_by' too.
+            //If you want to track who moderated the Model add 'moderated_by' too and set the column name on config file
             //$table->integer('moderated_by')->nullable()->unsigned();
         });
     }
