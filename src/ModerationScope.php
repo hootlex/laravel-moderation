@@ -317,7 +317,7 @@ class ModerationScope implements Scope
      */
     protected function getStatusColumn(Builder $builder)
     {
-        if (count($builder->getQuery()->joins) > 0) {
+        if ($builder->getQuery()->joins && count($builder->getQuery()->joins) > 0) {
             return $builder->getModel()->getQualifiedStatusColumn();
         } else {
             return $builder->getModel()->getStatusColumn();
