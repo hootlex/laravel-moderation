@@ -69,12 +69,6 @@ class ModerationScopeTest extends BaseTestCase
     }
 
     /** @test */
-    public function it_returns_only_postponed_stories()
-    {
-
-    }
-
-    /** @test */
     public function it_returns_stories_including_pending_ones()
     {
         $this->createPost([$this->status_column => Status::PENDING], 5);

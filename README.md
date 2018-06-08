@@ -23,8 +23,7 @@ First, install the package through Composer.
 composer require hootlex/laravel-moderation
 ```
 
-Then include the service provider inside `config/app.php`.
-
+If you are using Laravel < 5.5, you need to add Hootlex\Moderation\ModerationServiceProvider to your `config/app.php` providers array:
 ```php
 'providers' => [
     ...

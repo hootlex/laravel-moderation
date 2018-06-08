@@ -1,7 +1,12 @@
 {
   "name": "hootlex/laravel-moderation",
   "description": "A simple Content Moderation System for Laravel 5.* that allows you to Approve or Reject resources like posts, comments, users, etc.",
-  "keywords": ["laravel", "moderation", "moderation-system", "content-moderation"],
+  "keywords": [
+    "laravel",
+    "moderation",
+    "moderation-system",
+    "content-moderation"
+  ],
   "license": "MIT",
   "authors": [
     {
@@ -19,12 +24,20 @@
     "php": ">=5.4.0"
   },
   "require-dev": {
-    "phpunit/phpunit" : "5.*",
-    "laravel/laravel": "5.*"
+    "phpunit/phpunit": "7.0",
+    "laravel/laravel": "5.*",
+    "nunomaduro/collision": "^2.0"
   },
   "autoload": {
     "psr-4": {
       "Hootlex\\Moderation\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Hootlex\\Moderation\\ModerationServiceProvider"
+      ]
     }
   }
 }
