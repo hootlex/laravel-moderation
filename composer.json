@@ -1,5 +1,5 @@
 {
-  "name": "nguyentranchung/laravel-moderation",
+  "name": "hootlex/laravel-moderation",
   "description": "A simple Content Moderation System for Laravel 5.* that allows you to Approve or Reject resources like posts, comments, users, etc.",
   "keywords": [
     "laravel",
