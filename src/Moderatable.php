@@ -19,7 +19,7 @@ trait Moderatable
     }
 
     /**
-     * Change resource status to Approved
+     * Change resource status to approved.
      *
      * @param $id
      *
@@ -31,7 +31,7 @@ trait Moderatable
     }
 
     /**
-     * Change resource status to Rejected
+     * Change resource status to rejected.
      *
      * @param null $id
      *
@@ -43,7 +43,7 @@ trait Moderatable
     }
 
     /**
-     * Change resource status to Postpone
+     * Change resource status to postponed.
      *
      * @param null $id
      *
@@ -55,7 +55,7 @@ trait Moderatable
     }
 
     /**
-     * Change Instance's status to Approved
+     * Change instance's status to approved.
      *
      * @return mixed
      */
@@ -66,7 +66,7 @@ trait Moderatable
     }
 
     /**
-     * Change Instance's status to Rejected
+     * Change instance's status to rejected.
      *
      * @return mixed
      */
@@ -77,7 +77,7 @@ trait Moderatable
     }
 
     /**
-     * Change Instance's status to Postponed
+     * Change instance's status to postponed.
      *
      * @return mixed
      */
@@ -88,7 +88,7 @@ trait Moderatable
     }
 
     /**
-     * Change Instance's status to Pending
+     * Change instance's status to pending.
      *
      * @return mixed
      */
@@ -99,7 +99,7 @@ trait Moderatable
     }
 
     /**
-     * Determine if the model instance has been approved.
+     * Determine if the model instance is approved.
      *
      * @return bool
      */
@@ -109,7 +109,7 @@ trait Moderatable
     }
 
     /**
-     * Determine if the model instance has been approved.
+     * Determine if the model instance is rejected.
      *
      * @return bool
      */
@@ -119,7 +119,7 @@ trait Moderatable
     }
 
     /**
-     * Determine if the model instance has been postponed.
+     * Determine if the model instance is postponed.
      *
      * @return bool
      */
@@ -129,7 +129,7 @@ trait Moderatable
     }
 
     /**
-     * Determine if the model instance has been approved.
+     * Determine if the model instance is pending.
      *
      * @return bool
      */
