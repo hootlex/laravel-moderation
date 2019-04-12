@@ -62,7 +62,7 @@ trait Moderatable
     public function markApproved()
     {
         $new = (new static)->newQueryWithoutScope(new ModerationScope())->approve($this->id);
-        return $this->setRawAttributes($new->attributesToArray());
+        return $this->setRawAttributes($new->attributes);
     }
 
     /**
@@ -73,7 +73,7 @@ trait Moderatable
     public function markRejected()
     {
         $new = (new static)->newQueryWithoutScope(new ModerationScope())->reject($this->id);
-        return $this->setRawAttributes($new->attributesToArray());
+        return $this->setRawAttributes($new->attributes);
     }
 
     /**
@@ -84,7 +84,7 @@ trait Moderatable
     public function markPostponed()
     {
         $new = (new static)->newQueryWithoutScope(new ModerationScope())->postpone($this->id);
-        return $this->setRawAttributes($new->attributesToArray());
+        return $this->setRawAttributes($new->attributes);
     }
 
     /**
@@ -95,7 +95,7 @@ trait Moderatable
     public function markPending()
     {
         $new = (new static)->newQueryWithoutScope(new ModerationScope())->pend($this->id);
-        return $this->setRawAttributes($new->attributesToArray());
+        return $this->setRawAttributes($new->attributes);
     }
 
     /**
