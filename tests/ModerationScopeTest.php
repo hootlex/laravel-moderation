@@ -15,7 +15,7 @@ class ModerationScopeTest extends BaseTestCase
     protected $moderated_at_column;
     protected $moderated_by_column;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

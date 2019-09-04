@@ -14,7 +14,7 @@ class ModerationTraitTest extends BaseTestCase
     protected $status_column;
     protected $moderated_at_column;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
