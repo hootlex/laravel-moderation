@@ -25,6 +25,9 @@ class ModerationServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
+        Status::$PENDING = config('moderation.statuses.pending', 0);
+        Status::$APPROVED = config('moderation.statuses.approved', 1);
+        Status::$REJECTED = config('moderation.statuses.rejected', 2);
+        Status::$POSTPONED = config('moderation.statuses.postponed', 3);
     }
 }

@@ -5,8 +5,8 @@ namespace Hootlex\Moderation;
 
 class Status
 {
-    const PENDING = 0;
-    const APPROVED = 1;
-    const REJECTED = 2;
-    const POSTPONED = 3;
+    public static $PENDING = 0;
+    public static $APPROVED = 1;
+    public static $REJECTED = 2;
+    public static $POSTPONED = 3;
 }
