@@ -6,10 +6,11 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Support\Facades\Auth;
 
 class ModerationScope implements Scope
 {
-    /**
+    /**f
      * All of the extensions to be added to the builder.
      *
      * @var array
@@ -30,6 +31,27 @@ class ModerationScope implements Scope
     ];
 
     /**
+     * Check for route model binding on builder.
+     *
+     * @param Builder $builder
+     * @param Model $model
+     * @return bool
+     */
+    public function hasRouteModelBinding(Builder $builder, Model $model): bool
+    {
+        $key = $model->getRouteKeyName();
+
+        $wheres = array_filter($builder->getQuery()->wheres, function ($where) use ($key) {
+            return $where['type'] === 'Basic'
+                && $where['column'] === $key
+                && $where['operator'] === '='
+                && $where['boolean'] === 'and';
+        });
+
+        return count($wheres) === 1;
+    }
+
+    /**
      * Apply the scope to a given Eloquent query builder.
      *
      * @param  \Illuminate\Database\Eloquent\Builder $builder
@@ -39,6 +61,15 @@ class ModerationScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
+        $this->extend($builder);
+
+        if ($this->hasRouteModelBinding($builder, $model)) {
+            $user = Auth::user();
+            if ($user && method_exists($user, 'isModerator') && $user->isModerator()) {
+                return;
+            }
+        }
+
         $strict = (isset($model::$strictModeration))
             ? $model::$strictModeration
             : config('moderation.strict');
@@ -48,8 +79,6 @@ class ModerationScope implements Scope
         } else {
             $builder->where($model->getQualifiedStatusColumn(), '!=', Status::$REJECTED);
         }
-
-        $this->extend($builder);
     }
 
     /**
