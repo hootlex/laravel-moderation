@@ -2,8 +2,6 @@
 
 namespace Hootlex\Moderation;
 
-
-
 trait Moderatable
 {
     use ModerationQueryBuilder;
@@ -206,5 +204,15 @@ trait Moderatable
      */
     public function getDates(){
         return array_merge(parent::getDates(), [$this->getModeratedAtColumn()]);
+    }
+    
+    /**
+     * Defines the inverse relationship towards this "moderated_by" Eloquent User.
+     *
+     * @return string
+     */
+    public function moderator()
+    {
+        return $this->belongsTo(config('auth.providers.users.model'), $this->getModeratedByColumn());
     }
 }
