@@ -213,6 +213,6 @@ trait Moderatable
      */
     public function moderator()
     {
-        return $this->belongsTo(User::class, $this->getModeratedByColumn());
+        return $this->belongsTo(config('auth.providers.users.model'), $this->getModeratedByColumn());
     }
 }
